@@ -4,4 +4,5 @@
 pip install -r requirements.txt
 
 # Upgrade httpcore and httpx
-pip install --upgrade httpcore httpx
+pip install --upgrade httpcore 
+pip install httpx==0.13.3
