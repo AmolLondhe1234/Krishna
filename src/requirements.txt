@@ -1,4 +1,4 @@
-googletrans==4.0.0rc1
+googletrans
 pandas
 fastapi_jwt_auth
 uvicorn
