@@ -1,5 +1,5 @@
 httpcore
-googletrans==4.0.0
+googletrans==4.0.0rc1
 httpx
 pandas
 fastapi_jwt_auth
