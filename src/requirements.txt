@@ -2,6 +2,7 @@ googletrans==4.0.0rc1
 pandas
 fastapi_jwt_auth
 uvicorn
+langchain==0.0.284
 fastapi
 python-multipart
 python-jose
