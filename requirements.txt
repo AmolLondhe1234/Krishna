@@ -1,0 +1,17 @@
+httpcore
+googletrans==4.0.0
+httpx
+pandas
+fastapi_jwt_auth
+uvicorn
+fastapi
+python-multipart
+python-jose
+pymongo[srv]
+passlib[bcrypt]
+langchain
+openpyxl
+openai
+pypdf
+tiktoken
+bs4
