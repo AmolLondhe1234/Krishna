@@ -80,7 +80,7 @@ class QARecoBot(MongoService):
             user_language = self.detect_language(question)
 
         # Translate the question to English
-        if user_language != 'en':
+        if user_language :
             question = self.translate_to_english(question)
 
         # Construct the prompt
@@ -90,7 +90,7 @@ class QARecoBot(MongoService):
         result = self.qa_chain({"question": prompt, "chat_history": ""})
 
         # If the answer is in English, translate it back to the user's language
-        if user_language != 'en':
+        if user_language :
             result["answer"] = self.translator.translate(result["answer"], dest=user_language).text
 
         return result["answer"]
