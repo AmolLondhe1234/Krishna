@@ -63,14 +63,33 @@ class QARecoBot(MongoService):
         )
         return chat_qa   
     
-    def interact(self, question, target_language='en'):
-        # Translate question to English (or the desired language for processing)
-        question_english = self.translator.translate(question, src='auto', dest='en').text
+    def detect_language(self, text):
+        # Detect the language of the input text
+        lang = self.translator.detect(text).lang
+        return lang
 
-        # Use English question for processing
-        prompt = HEADER + f"\nQuestion: {question_english}"
+    def translate_to_english(self, text):
+        # Translate text to English
+        translation = self.translator.translate(text, dest='en')
+        return translation.text
+    
+    def interact(self, question, user_language=None):
+        # If user_language is not provided, detect the language
+        if not user_language:
+            user_language = self.detect_language(question)
+
+        # Translate the question to English
+        if user_language != 'en':
+            question = self.translate_to_english(question)
+
+        # Construct the prompt
+        prompt = HEADER + f"\nQuestion: {question}"
+
+        # Call your QA method with the translated question
         result = self.qa_chain({"question": prompt, "chat_history": ""})
 
-        # Translate the response back to the user's language
-        answer_translated = self.translator.translate(result["answer"], src='en', dest=target_language).text
-        return answer_translated
+        # If the answer is in English, translate it back to the user's language
+        if user_language != 'en':
+            result["answer"] = self.translator.translate(result["answer"], dest=user_language).text
+
+        return result["answer"]
