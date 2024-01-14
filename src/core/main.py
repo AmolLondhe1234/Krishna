@@ -9,7 +9,7 @@ from langchain.document_loaders import TextLoader, PyPDFLoader
 from tqdm import tqdm
 from database.mongoservices import MongoService
 from langchain.vectorstores import MongoDBAtlasVectorSearch 
-from googletrans import Translator  # Use the 'translate' library instead of 'googletrans'
+from googletrans import Translator
 
 EMBD_INDEX = "langchain_demo"
 
@@ -42,7 +42,6 @@ class RecoBotModelGenerator(MongoService):
     def start(self):
         self.create_emb()
 
-
 class QARecoBot(MongoService):
 
     def __init__(self) -> None:
@@ -64,9 +63,14 @@ class QARecoBot(MongoService):
         )
         return chat_qa   
     
-    def interact(self, question):
-        prompt = HEADER + f"\nQuestion: {question}"
-        result = self.qa_chain({"question": prompt, "chat_history": ""})
-        return result["answer"]
-    
+    def interact(self, question, target_language='en'):
+        # Translate question to English (or the desired language for processing)
+        question_english = self.translator.translate(question, src='auto', dest='en').text
 
+        # Use English question for processing
+        prompt = HEADER + f"\nQuestion: {question_english}"
+        result = self.qa_chain({"question": prompt, "chat_history": ""})
+
+        # Translate the response back to the user's language
+        answer_translated = self.translator.translate(result["answer"], src='en', dest=target_language).text
+        return answer_translated
