@@ -17,7 +17,7 @@ class RecoBotModelGenerator(MongoService):
 
     def __init__(self) -> None:
         super().__init__()
-        os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi','key')
+        # os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi','key')
 
     def read_files(self):
         documents = []
@@ -46,7 +46,7 @@ class QARecoBot(MongoService):
 
     def __init__(self) -> None:
         super().__init__()
-        os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi','key')
+        # os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi','key')
         self.translator = Translator()
 
         # Use 'translate' library for language translation
