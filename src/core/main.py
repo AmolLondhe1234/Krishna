@@ -57,7 +57,7 @@ class QARecoBot(MongoService):
         vectordb =  MongoDBAtlasVectorSearch(collection=self.embd_collection_name, embedding=OpenAIEmbeddings(), index_name=EMBD_INDEX)
         chat_qa = ConversationalRetrievalChain.from_llm(
             ChatOpenAI(temperature=TEMPERATURE, model_name=MODEL),
-            vectordb.as_retriever(search_kwargs={"k":1}),
+            vectordb.as_retriever(search_kwargs={"k":20, "case_sensetive":False}),
             return_source_documents=True,
             verbose=False
         )
