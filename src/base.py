@@ -10,7 +10,6 @@ class Base:
     def setup_config(self,config_filename):
         con_parser = configparser.RawConfigParser()
         con_parser.read(config_filename)
-        print(con_parser)
         return con_parser
     
     
