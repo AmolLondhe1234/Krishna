@@ -12,7 +12,6 @@ from langchain.document_loaders import PyPDFLoader
 from tqdm import tqdm
 from database.mongoservices import MongoService
 from googletrans import Translator
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 EMBD_INDEX = "langchain_demo"
 
