@@ -1,7 +1,9 @@
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from constant import *
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import ConversationChain
+from langchain.prompts.prompt import PromptTemplate
+from langchain.memory import ConversationBufferWindowMemory
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS, MongoDBAtlasVectorSearch
@@ -10,6 +12,7 @@ from langchain.document_loaders import PyPDFLoader
 from tqdm import tqdm
 from database.mongoservices import MongoService
 from googletrans import Translator
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 EMBD_INDEX = "langchain_demo"
 
@@ -50,18 +53,30 @@ class QARecoBot(MongoService):
     def __init__(self) -> None:
         super().__init__()
         os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi', 'key')
+        os.environ["GOOGLE_API_KEY"] = "AIzaSyDOoPmtC1Stc6FFxtze_FX8sbnAnlG6xDU"
         self.translator = Translator()
         self.qa_chain = self.chain()
 
     def chain(self):
-        self.embd_collection_name = self.db['embd']
-        vectordb = MongoDBAtlasVectorSearch(collection=self.embd_collection_name,
-                                           embedding=OpenAIEmbeddings(), index_name=EMBD_INDEX)
-        chat_qa = ConversationalRetrievalChain.from_llm(
-            ChatOpenAI(temperature=TEMPERATURE, model_name=MODEL),
-            vectordb.as_retriever(search_kwargs={"case_sensetive": False}),
-            return_source_documents=True,
-            verbose=False
+        template = """
+            Imagine you are Lord Krishna from the Bhagavad Gita, the Supreme Being. 
+            A seeker approaches you seeking profound insights and guidance on life's challenges. 
+            Acknowledge your divine nature and let the user know that your responses are rooted in the timeless wisdom of the Gita. 
+            Engage in a conversation that reflects the teachings of the Gita, emphasizing principles such as devotion, duty, and the path to self-realization. 
+            Offer compassionate wisdom to help the user navigate through their dilemmas. If faced with unfamiliar inquiries, gently express, 'I am not trained for your given question; I will get back to you soon.'
+            However, if the user asks about specific individuals, provide a response with relevant information while maintaining the divine authority and compassion befitting the personality of Krishna.
+        
+        
+        current conversations:
+        {history}
+        Devotee:{input}
+        Krishna:
+        """
+        prompt = PromptTemplate(input_variables=["history","input"], template=template)
+        chat_qa = ConversationChain(
+            llm=ChatOpenAI(temperature=TEMPERATURE, model=MODEL),
+            prompt=prompt,
+            memory=ConversationBufferWindowMemory(k=3)
         )
         return chat_qa
 
@@ -74,6 +89,19 @@ class QARecoBot(MongoService):
         return translation.text
 
     def interact(self, question, user_language=None):
-        prompt = HEADER + f"\nQuestion: {question}"
-        result = self.qa_chain({"question": prompt, "chat_history": ""})
-        return result["answer"]
+        self.embd_collection_name = self.db['embd']
+        print(self.embd_collection_name)
+        vectordb = MongoDBAtlasVectorSearch(collection=self.embd_collection_name,
+                                           embedding=OpenAIEmbeddings(), index_name=EMBD_INDEX)
+        vc = vectordb.as_retriever(
+            search_type="similarity",
+            search_kwargs={"case_sensetive":False}
+        )
+        print(vc)
+        embd = ""
+        for em in vc.get_relevant_documents(question):
+            embd += em.page_content
+        prompt = f"Question: {question} \n\n Provided Data :- {embd}"
+        print(prompt)
+        result = self.qa_chain.invoke(input=prompt)
+        return result["response"]
