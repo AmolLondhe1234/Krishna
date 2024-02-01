@@ -18,7 +18,7 @@ EMBD_INDEX = "langchain_demo"
 class RecoBotModelGenerator(MongoService):
     def __init__(self) -> None:
         super().__init__()
-        os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi', 'key')
+        # os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi', 'key')
 
     def load_document(self, file):
         pdf_path = DATA_PATH + "/" + file
@@ -51,8 +51,8 @@ class RecoBotModelGenerator(MongoService):
 class QARecoBot(MongoService):
     def __init__(self) -> None:
         super().__init__()
-        os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi', 'key')
-        os.environ["GOOGLE_API_KEY"] = "AIzaSyDOoPmtC1Stc6FFxtze_FX8sbnAnlG6xDU"
+        # os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi', 'key')
+        # os.environ["GOOGLE_API_KEY"] = "AIzaSyDOoPmtC1Stc6FFxtze_FX8sbnAnlG6xDU"
         self.translator = Translator()
         self.qa_chain = self.chain()
 
