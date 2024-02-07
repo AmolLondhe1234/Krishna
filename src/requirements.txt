@@ -15,4 +15,3 @@ openai
 pypdf
 tiktoken
 bs4
-multiprocessing
