@@ -2,7 +2,7 @@ googletrans
 pandas
 fastapi_jwt_auth
 dnspython==2.3.0
-uvicorn
+uvicorn==0.22.0
 langchain==0.0.284
 fastapi
 python-multipart
