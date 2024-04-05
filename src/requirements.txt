@@ -13,5 +13,7 @@ langchain
 openpyxl
 openai
 pypdf
+langchain-groq
+langchain_core
 tiktoken
 bs4
