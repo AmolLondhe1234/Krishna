@@ -54,6 +54,7 @@ class QARecoBot(MongoService):
     def __init__(self) -> None:
         super().__init__()
         os.environ["OPENAI_API_KEY"] = self.cfg.get('openapi', 'key')
+        os.environ["GROQ_API_KEY"] = self.cfg.get('groqapi', 'key')
         # os.environ["GOOGLE_API_KEY"] = "AIzaSyDOoPmtC1Stc6FFxtze_FX8sbnAnlG6xDU"
         # self.translator = Translator()
         # self.qa_chain = self.chain()
@@ -98,7 +99,7 @@ class QARecoBot(MongoService):
         with Pool() as pool:
             embd_list = pool.map(self.get_page_content, doc)
         embd = "".join(embd_list)    
-        prompt = f"Question: {question} \n\n Provided Data :- {embd}"
+        prompt = f"{HEADER}\nQuestion: {question} \n\n Provided Data :- {embd}"
         print(prompt)
         self.qa_chain = self.chain()
         result = self.qa_chain.invoke({"text":prompt})
